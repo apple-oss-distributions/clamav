@@ -10,11 +10,11 @@
 # Path to the database directory.
 # WARNING: It must match clamd.conf's directive!
 # Default: hardcoded (depends on installation options)
-DatabaseDirectory /var/clamav
+DatabaseDirectory /Library/Server/Mail/Data/scanner/clamav/db
 
 # Path to the log file (make sure it has proper permissions)
 # Default: disabled
-UpdateLogFile /var/log/freshclam.log
+# UpdateLogFile /Library/Logs/Mail/freshclam.log
 
 # Maximum size of the log file.
 # Value of 0 disables the limit.
@@ -22,7 +22,7 @@ UpdateLogFile /var/log/freshclam.log
 # and 'K' or 'k' for kilobytes (1K = 1k = 1024 bytes).
 # in bytes just don't use modifiers.
 # Default: 1M
-#LogFileMaxSize 2M
+LogFileMaxSize 2M
 
 # Log time with each message.
 # Default: no
@@ -39,11 +39,11 @@ LogSyslog yes
 # Specify the type of syslog messages - please refer to 'man syslog'
 # for facility names.
 # Default: LOG_LOCAL6
-LogFacility LOG_LOCAL2
+# LogFacility LOG_MAIL
 
 # This option allows you to save the process identifier of the daemon
 # Default: disabled
-PidFile /var/clamav/freshclam.pid
+PidFile /Library/Server/Mail/Data/scanner/clamav/freshclam.pid
 
 # By default when started freshclam drops privileges and switches to the
 # "clamav" user. This directive allows you to change the database owner.
@@ -64,6 +64,7 @@ DatabaseOwner _clamav
 
 # Uncomment the following line and replace XY with your country
 # code. See http://www.iana.org/cctld/cctld-whois.htm for the full list.
+# You can use db.XY.ipv6.clamav.net for IPv6 connections.
 #DatabaseMirror db.XY.clamav.net
 
 # database.clamav.net is a round-robin record which points to our most 
@@ -86,6 +87,12 @@ DatabaseMirror database.clamav.net
 # the change will take effect with the next database update.
 # Default: no
 #CompressLocalDatabase no
+
+# With this option you can provide custom sources (http:// or file://) for
+# database files. This option can be used multiple times.
+# Default: no custom URLs
+#DatabaseCustomURL http://myserver.com/mysigs.ndb
+#DatabaseCustomURL file:///mnt/nfs/local.hdb
 
 # Number of database checks per day.
 # Default: 12 (every two hours)
@@ -152,7 +159,7 @@ Foreground yes
 # the latest virus detections in your environment. The ClamAV maintainers
 # will then use this data to determine what types of malware are the most
 # detected in the field and in what geographic area they are.
-# This feature requires LogTime and LogFile to be enabled in clamd.conf.
+# Freshclam will connect to clamd in order to get recent statistics.
 # Default: no
 #SubmitDetectionStats /path/to/clamd.conf
 
@@ -198,4 +205,11 @@ Foreground yes
 # This option enables downloading of bytecode.cvd, which includes additional
 # detection mechanisms and improvements to the ClamAV engine.
 # Default: enabled
-Bytecode no
+#Bytecode yes
+
+# Download an additional 3rd party signature database distributed through
+# the ClamAV mirrors. Here you can find a list of available databases:
+# http://www.clamav.net/download/cvd/3rdparty
+# This option can be used multiple times.
+#ExtraDatabase dbname1
+#ExtraDatabase dbname2

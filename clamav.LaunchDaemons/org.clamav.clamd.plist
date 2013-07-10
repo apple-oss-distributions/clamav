@@ -12,13 +12,13 @@
 	<array>
 		<string>/usr/bin/sandbox-exec</string>
 		<string>-f</string>
-		<string>/usr/share/sandbox/clamd.sb</string>
-		<string>/usr/sbin/clamd</string>
+		<string>/Applications/Server.app/Contents/ServerRoot/usr/share/sandbox/clamd.sb</string>
+		<string>/Applications/Server.app/Contents/ServerRoot/usr/sbin/clamd</string>
 	</array>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>TMPDIR</key>
-		<string>/private/var/amavis/tmp</string>
+		<string>/Library/Server/Mail/Data/scanner/amavis/tmp</string>
 	</dict>
 	<key>ServiceIPC</key>
 	<false/>

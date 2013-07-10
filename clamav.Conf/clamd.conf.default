@@ -11,7 +11,7 @@
 # LogFile must be writable for the user running daemon.
 # A full path is required.
 # Default: disabled
-LogFile /var/log/clamav.log
+# LogFile /Library/Logs/Mail/clamav.log
 
 # By default the log file is locked for writing - the lock protects against
 # running clamd multiple times (if want to run another clamd, please
@@ -27,7 +27,7 @@ LogFile /var/log/clamav.log
 # and 'K' or 'k' for kilobytes (1K = 1k = 1024 bytes). To specify the size
 # in bytes just don't use modifiers.
 # Default: 1M
-#LogFileMaxSize 2M
+LogFileMaxSize 2M
 
 # Log time with each message.
 # Default: no
@@ -45,16 +45,20 @@ LogSyslog yes
 # Specify the type of syslog messages - please refer to 'man syslog'
 # for facility names.
 # Default: LOG_LOCAL6
-LogFacility LOG_LOCAL2
+# LogFacility LOG_MAIL
 
 # Enable verbose logging.
 # Default: no
 #LogVerbose yes
 
+# Log additional information about the infected file, such as its
+# size and hash, together with the virus name.
+ExtendedDetectionInfo yes
+
 # This option allows you to save a process identifier of the listening
 # daemon (main thread).
 # Default: disabled
-PidFile  /var/amavis/clamd.pid
+PidFile  /Library/Server/Mail/Data/scanner/amavis/clamd.pid
 
 # Optional path to the global temporary directory.
 # Default: system specific (usually /tmp or /var/tmp).
@@ -62,7 +66,7 @@ PidFile  /var/amavis/clamd.pid
 
 # Path to the database directory.
 # Default: hardcoded (depends on installation options)
-DatabaseDirectory /var/clamav
+DatabaseDirectory /Library/Server/Mail/Data/scanner/clamav/db
 
 # Only load the official signatures published by the ClamAV project.
 # Default: no
@@ -73,7 +77,7 @@ DatabaseDirectory /var/clamav
 
 # Path to a local socket file the daemon will listen on.
 # Default: disabled (must be specified by a user)
-LocalSocket  /var/amavis/clamd
+LocalSocket  /Library/Server/Mail/Data/scanner/amavis/clamd
 
 # Sets the group ownership on the unix socket.
 # Default: disabled (the primary group of the user running clamd)
@@ -99,7 +103,7 @@ FixStaleSocket yes
 #TCPAddr 127.0.0.1
 
 # Maximum length the queue of pending connections may grow to.
-# Default: 15
+# Default: 200
 #MaxConnectionQueueLength 30
 
 # Clamd uses FTP-like protocol to receive data from remote clients.
@@ -122,7 +126,6 @@ FixStaleSocket yes
 #MaxThreads 20
 
 # Waiting for data from a client socket will timeout after this time (seconds).
-# Value of 0 disables the timeout.
 # Default: 120
 #ReadTimeout 300
 
@@ -237,12 +240,15 @@ Foreground yes
 # in all 32 and 64-bit versions of Windows operating systems. This option allows
 # ClamAV to perform a deeper analysis of executable files and it's also
 # required for decompression of popular executable packers such as UPX, FSG,
-# and Petite.
+# and Petite. If you turn off this option, the original files will still be
+# scanned, but without additional processing.
 # Default: yes
 #ScanPE yes
 
 # Executable and Linking Format is a standard format for UN*X executables.
 # This option allows you to control the scanning of ELF files.
+# If you turn off this option, the original files will still be scanned, but
+# without additional processing.
 # Default: yes
 #ScanELF yes
 
@@ -258,10 +264,20 @@ Foreground yes
 
 # This option enables scanning of OLE2 files, such as Microsoft Office
 # documents and .msi files.
+# If you turn off this option, the original files will still be scanned, but
+# without additional processing.
 # Default: yes
 #ScanOLE2 yes
 
+
+# With this option enabled OLE2 files with VBA macros, which were not
+# detected by signatures will be marked as "Heuristics.OLE2.ContainsMacros".
+# Default: no
+#OLE2BlockMacros no
+
 # This option enables scanning within PDF files.
+# If you turn off this option, the original files will still be scanned, but
+# without decoding and additional processing.
 # Default: yes
 #ScanPDF yes
 
@@ -271,6 +287,8 @@ Foreground yes
 ##
 
 # Enable internal e-mail scanner.
+# If you turn off this option, the original files will still be scanned, but
+# without parsing individual messages/attachments.
 # Default: yes
 #ScanMail yes
 
@@ -354,6 +372,8 @@ Foreground yes
 
 # Perform HTML normalisation and decryption of MS Script Encoder code.
 # Default: yes
+# If you turn off this option, the original files will still be scanned, but
+# without additional processing.
 #ScanHTML yes
 
 
@@ -362,6 +382,8 @@ Foreground yes
 ##
 
 # ClamAV can scan within archives and compressed files.
+# If you turn off this option, the original files will still be scanned, but
+# without unpacking and additional processing.
 # Default: yes
 #ScanArchive yes
 
@@ -449,6 +471,12 @@ Foreground yes
 # Default: disabled
 #ClamukoExcludePath /home/bofh
 
+# With this option you can whitelist specific UIDs. Processes with these UIDs
+# will be able to access all files.
+# This option can be used multiple times (one per line).
+# Default: disabled
+#ClamukoExcludeUID 0
+
 # With this option enabled ClamAV will load bytecode from the database. 
 # It is highly recommended you keep this option on, otherwise you'll miss detections for many new viruses.
 # Default: yes
@@ -470,5 +498,5 @@ Foreground yes
 
 # Set bytecode timeout in miliseconds.
 # 
-# Default: 60000
-# BytecodeTimeout 60000
+# Default: 5000
+# BytecodeTimeout 1000

@@ -7,10 +7,10 @@
 	<key>Label</key>
 	<string>org.clamav.freshclam-init</string>
 	<key>Program</key>
-	<string>/usr/bin/freshclam</string>
+	<string>/Applications/Server.app/Contents/ServerRoot/usr/bin/freshclam</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>freshclam</string>
+		<string>/Applications/Server.app/Contents/ServerRoot/usr/bin/freshclam</string>
 		<string>--quiet</string>
 	</array>
 	<key>ServiceIPC</key>
