@@ -13,6 +13,8 @@
 		<string>/Applications/Server.app/Contents/ServerRoot/usr/bin/freshclam</string>
 		<string>--quiet</string>
 	</array>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/Mail/freshclam.log</string>
 	<key>ServiceIPC</key>
 	<false/>
 	<key>UserName</key>

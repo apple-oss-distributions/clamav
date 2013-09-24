@@ -13,6 +13,7 @@
 		<string>/usr/bin/sandbox-exec</string>
 		<string>-f</string>
 		<string>/Applications/Server.app/Contents/ServerRoot/usr/share/sandbox/clamd.sb</string>
+		<string>/Applications/Server.app/Contents/ServerRoot/usr/libexec/clamav/clamd_preflight</string>
 		<string>/Applications/Server.app/Contents/ServerRoot/usr/sbin/clamd</string>
 	</array>
 	<key>EnvironmentVariables</key>
@@ -20,6 +21,10 @@
 		<key>TMPDIR</key>
 		<string>/Library/Server/Mail/Data/scanner/amavis/tmp</string>
 	</dict>
+	<key>StandardOutPath</key>
+	<string>/Library/Logs/Mail/clamav.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/Mail/clamav.log</string>
 	<key>ServiceIPC</key>
 	<false/>
 	<key>UserName</key>

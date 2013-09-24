@@ -14,7 +14,10 @@
 	<array>
 		<string>/Applications/Server.app/Contents/ServerRoot/usr/bin/freshclam</string>
 		<string>-d</string>
+		<string>-v</string>
 	</array>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/Mail/freshclam.log</string>
 	<key>ServiceIPC</key>
 	<false/>
 	<key>ThrottleInterval</key>

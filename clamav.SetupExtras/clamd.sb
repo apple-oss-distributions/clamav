@@ -10,18 +10,28 @@
 ; When the sandbox takes root, we're in the sandbox-exec(1) helper.  The helper needs to be able to
 ; actually start clamd.
 (allow process-fork)
-(allow process-exec (literal "/Applications/Server.app/Contents/ServerRoot/usr/sbin/clamd"))
+(allow process-exec
+	(regex "^/usr/bin/perl5*")
+	(literal "/Applications/Server.app/Contents/ServerRoot/usr/libexec/clamav/clamd_preflight")
+	(literal "/Applications/Server.app/Contents/ServerRoot/usr/sbin/clamd")
+)
+
+;allow processes to traverse symlinks
+(allow file-read-metadata)
 
 ; Allow read access to several files...
 (allow file-read* 
 	(literal "/dev/null")
 	(literal "/dev/random")
 	(literal "/dev/urandom")
-	(literal "/Library/Server/Mail/Config/clamav/clamd.conf")
 	(literal "/Library/Logs/Mail/clamav.log")
-	(subpath "/Applications/Server.app/Contents/ServerRoot/usr/lib")
-	(subpath "/Library/Server/Mail/Data/scanner/clamav/db")
+	(literal "/Library/Server/Mail/Config/clamav/clamd.conf")
+	(subpath "/usr/bin")
+	(subpath "/Library/Perl")
 	(subpath "/Library/Server/Mail/Data/scanner/amavis")
+	(subpath "/Library/Server/Mail/Data/scanner/clamav/db")
+	(subpath "/Applications/Server.app/Contents/ServerRoot/usr/lib")
+	(subpath "/Applications/Server.app/Contents/ServerRoot/usr/libexec/clamav")
 )
 
 ; Allow write access to a few files...

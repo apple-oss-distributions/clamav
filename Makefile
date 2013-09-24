@@ -1,33 +1,33 @@
 # xbs-compatible wrapper Makefile for Clam AV
 #
 
-Project		= clamav
-OPEN_SOURCE_VER	= 0.97.8
+Project			= clamav
+DELIVERABLE		= clamav
+OPEN_SOURCE_VER	= 0.98
 PROJECT_VERSION	= $(Project)-$(OPEN_SOURCE_VER)
 
 # Configuration values we customize
 #
 CLAMAV_OWNER		= _clamav
 CLAMAV_GROUP		= _clamav
-CLAMAV_TAR_GZ		= $(PROJECT_VERSION).tar.gz
 
 PROJECT_BIN_DIR		= $(Project).Bin
 PROJECT_CONF_DIR	= $(Project).Conf
 PROJECT_SETUP_DIR	= $(Project).SetupExtras
 PROJECT_LD_DIR		= $(Project).LaunchDaemons
 PROJECT_OS_DIR		= $(Project).OpenSourceInfo
-PROJECT_PATCH		= $(Project)-patch-7054720.diff
+PROJECT_PATCH_DIR	= $(Project).Patches
 
 DATA_DIR		= /Library/Server/Mail/Data
 CONFIG_DIR		= /Library/Server/Mail/Config
 
-COMMON_EXTRAS_DIR	= $(SERVER_INSTALL_PATH_PREFIX)/System/Library/ServerSetup/CommonExtras
-PROMO_EXTRAS_DIR	= $(SERVER_INSTALL_PATH_PREFIX)/System/Library/ServerSetup/PromotionExtras
-
-SETUP_CLAMAV		= $(COMMON_EXTRAS_DIR)/63-setup_clamav.sh
-PROMO_CLAMAV		= $(PROMO_EXTRAS_DIR)/63-setup_clamav.sh
+PROMO_DIR			= $(SERVER_INSTALL_PATH_PREFIX)/System/Library/ServerSetup/PromotionExtras
+SRC_PROMO_SCRIPT	= service_promotion.pl
+DST_PROMO_SCRIPT	= 63-mail_services_virus_scanner.pl
 
 USR_LIBS		= libclamav.6.dylib libclamunrar.6.dylib libclamunrar_iface.6.so
+
+PATCH_FILES		= patch1.txt patch2.txt patch3.txt patch4.txt patch5.txt
 
 CONFIG_ENV		= MAKEOBJDIR="$(BuildDirectory)" \
 	        		INSTALL_ROOT="$(DSTROOT)" \
@@ -117,21 +117,21 @@ build-clamav :: extract-sources make-clamav
 
 extract-sources : $(TMPDIR)
 	@echo "***** Extracting sources from: $(CLAMAV_TAR_GZ)"
-	$(_v) cd $(BuildDirectory) && gnutar -xzpf $(Sources)/$(PROJECT_BIN_DIR)/$(CLAMAV_TAR_GZ)
+	$(_v) cd $(BuildDirectory) && cp -rf $(Sources)/$(PROJECT_BIN_DIR)/$(PROJECT_VERSION) .
 	$(_v) $(MV) $(BuildDirectory)/$(PROJECT_VERSION) $(BuildDirectory)/$(Project)
 	@echo "***** Extracting sources complete."
-
-make-clamav-x : $(TMPDIR)
-	$(_v) $(MKDIR) -p $(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)
-	$(_v) cd $(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX) && gnutar -xzvpf $(SRCROOT)/$(PROJECT_BIN_DIR)/bins.tar.gz
 
 make-clamav : $(TMPDIR)
 	@echo "***** Building $(Project)"
 	@echo "***** Applying project patches: $(PROJECT_PATCH)"
-	$(_v) if [ -e "$(SRCROOT)/$(PROJECT_BIN_DIR)/$(PROJECT_PATCH)" ]; then\
-		(cd "$(BuildDirectory)/$(Project)" && patch -p1 < "$(SRCROOT)/$(PROJECT_BIN_DIR)/$(PROJECT_PATCH)") ; \
-	fi
+	$(_v) cd "$(BuildDirectory)/$(Project)" && for file in $(PATCH_FILES);\
+	do \
+		echo "*----------------------------" ; \
+		echo "* Applying patch: $${file}" ; \
+		patch -p1 < "$(SRCROOT)/$(PROJECT_PATCH_DIR)/$${file}" ; \
+	done
 	@echo "***** Applying project patches complete."
+	@echo "*----------------------------"
 	@echo "***** Configuring $(Project) shared, version $(PROJECT_VERSION)"
 	$(_v) cd $(BuildDirectory)/$(Project) && $(CONFIG_ENV) $(Extra_Configure_Environment) $(ConfigureProject) $(Common_Configure_Flags) $(Project_Configure_Flags)
 	$(_v) touch $@
@@ -239,7 +239,6 @@ install-extras : install-open-source-files
 	# install directories
 	$(_v) $(INSTALL_DIRECTORY) "$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(ETCDIR)"
 	$(_v) $(INSTALL_DIRECTORY) "$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(SHAREDIR)/sandbox"
-	$(_v) $(INSTALL_DIRECTORY) "$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(NSLIBRARYDIR)/ServerSetup/CommonExtras"
 	$(_v) $(INSTALL_DIRECTORY) "$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(NSLIBRARYDIR)/ServerSetup/PromotionExtras"
 
 	# Service configuration files
@@ -248,19 +247,19 @@ install-extras : install-open-source-files
 	$(_v) $(INSTALL_FILE) "$(SRCROOT)/$(PROJECT_CONF_DIR)/freshclam.conf.default" \
 			"$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(ETCDIR)/freshclam.conf.default"
 
-	# Service setup script
-	$(SILENT) (/bin/echo "#!/bin/sh" > "$(DSTROOT)/$(SETUP_CLAMAV)")
-	$(SILENT) (/bin/echo "#" >> "$(DSTROOT)/$(SETUP_CLAMAV)")
-	$(SILENT) (/bin/echo "" >> "$(DSTROOT)/$(SETUP_CLAMAV)")
-	$(SILENT) (/bin/echo "_server_root=$(SERVER_INSTALL_PATH_PREFIX)" >> "$(DSTROOT)/$(SETUP_CLAMAV)")
-	$(SILENT) (/bin/cat "$(SRCROOT)/$(PROJECT_SETUP_DIR)/SetupClamAV.sh" >> "$(DSTROOT)/$(SETUP_CLAMAV)")
-	$(SILENT) (/bin/chmod 755 "$(DSTROOT)/$(SETUP_CLAMAV)")
-	install -m 0755 "$(DSTROOT)/$(SETUP_CLAMAV)"  "$(DSTROOT)/$(PROMO_CLAMAV)"
-	$(SILENT) (/bin/chmod 755 "$(DSTROOT)/$(PROMO_CLAMAV)")
+	# Service promotion script
+	$(_v) $(INSTALL_FILE) "$(SRCROOT)/$(PROJECT_SETUP_DIR)/$(SRC_PROMO_SCRIPT)" \
+			"$(DSTROOT)$(PROMO_DIR)/$(DST_PROMO_SCRIPT)"
+	$(SILENT) (/bin/chmod 755 "$(DSTROOT)$(PROMO_DIR)/$(DST_PROMO_SCRIPT)")
 
 	# Sandbox setup
 	$(_v) $(INSTALL_FILE) "$(SRCROOT)/$(PROJECT_SETUP_DIR)/clamd.sb" \
 			"$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(SHAREDIR)/sandbox/clamd.sb"
+
+	# Install clamd preflight script
+	$(_v) $(INSTALL_DIRECTORY) "$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(LIBEXECDIR)/$(DELIVERABLE)"
+	$(_v) $(INSTALL_SCRIPT) "$(SRCROOT)/$(PROJECT_SETUP_DIR)/clamd_preflight" \
+			"$(DSTROOT)$(SERVER_INSTALL_PATH_PREFIX)$(LIBEXECDIR)/$(DELIVERABLE)/clamd_preflight"
 
 	# Install missing man page
 	$(_v) $(INSTALL_FILE) "$(SRCROOT)/$(PROJECT_CONF_DIR)/clambc.1" \

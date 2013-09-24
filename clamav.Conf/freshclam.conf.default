@@ -14,7 +14,7 @@ DatabaseDirectory /Library/Server/Mail/Data/scanner/clamav/db
 
 # Path to the log file (make sure it has proper permissions)
 # Default: disabled
-# UpdateLogFile /Library/Logs/Mail/freshclam.log
+UpdateLogFile /Library/Logs/Mail/freshclam.log
 
 # Maximum size of the log file.
 # Value of 0 disables the limit.
@@ -32,9 +32,15 @@ LogTime yes
 # Default: no
 LogVerbose yes
 
+# Specify non-syslog logging level.
+# Valid settings: crit, error, warning, notice, info, debug
+# Note: debug overrides LogVerbose
+# Default: info
+LogLevel info
+
 # Use system logger (can work together with UpdateLogFile).
 # Default: no
-LogSyslog yes
+#LogSyslog yes
 
 # Specify the type of syslog messages - please refer to 'man syslog'
 # for facility names.
